@@ -1,0 +1,234 @@
+// HANOI DISCOVERY database schema (PostgreSQL).
+// Translatable text lives in *Translation tables (one row per locale).
+// Fields that must be verified before display (coordinates, opening hours,
+// ticket info) are nullable: the UI shows nothing when they are empty.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Locale {
+  vi
+  en
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Category {
+  id           String                @id @default(cuid())
+  slug         String                @unique
+  sortOrder    Int                   @default(0)
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  translations CategoryTranslation[]
+  destinations Destination[]
+}
+
+model CategoryTranslation {
+  id          String   @id @default(cuid())
+  categoryId  String
+  locale      Locale
+  name        String
+  description String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, locale])
+}
+
+model Destination {
+  id           String                   @id @default(cuid())
+  slug         String                   @unique
+  categoryId   String
+  status       ContentStatus            @default(DRAFT)
+  /// True for development sample content; never shown as verified data.
+  isSample     Boolean                  @default(false)
+  latitude     Float?
+  longitude    Float?
+  openingHours String?
+  ticketInfo   String?
+  /// Where the verifiable facts above came from.
+  sourceUrl    String?
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  category     Category                 @relation(fields: [categoryId], references: [id])
+  translations DestinationTranslation[]
+  favorites    Favorite[]
+
+  @@index([categoryId])
+  @@index([status])  /// Optional cover image from the media library (never deleted while in use; SetNull is a safety net).
+  imageId      String?
+  image        MediaAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  @@index([imageId])
+}
+
+model DestinationTranslation {
+  id            String      @id @default(cuid())
+  destinationId String
+  locale        Locale
+  name          String
+  summary       String
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@unique([destinationId, locale])
+}
+
+model Food {
+  id           String            @id @default(cuid())
+  slug         String            @unique
+  status       ContentStatus     @default(DRAFT)
+  isSample     Boolean           @default(false)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  translations FoodTranslation[]
+
+  @@index([status])  /// Optional cover image from the media library (never deleted while in use; SetNull is a safety net).
+  imageId      String?
+  image        MediaAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  @@index([imageId])
+}
+
+model FoodTranslation {
+  id      String  @id @default(cuid())
+  foodId  String
+  locale  Locale
+  name    String
+  summary String?
+  food    Food    @relation(fields: [foodId], references: [id], onDelete: Cascade)
+
+  @@unique([foodId, locale])
+}
+
+model CultureItem {
+  id           String                   @id @default(cuid())
+  slug         String                   @unique
+  status       ContentStatus            @default(DRAFT)
+  isSample     Boolean                  @default(false)
+  createdAt    DateTime                 @default(now())
+  updatedAt    DateTime                 @updatedAt
+  translations CultureItemTranslation[]
+
+  @@index([status])  /// Optional cover image from the media library (never deleted while in use; SetNull is a safety net).
+  imageId      String?
+  image        MediaAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  @@index([imageId])
+}
+
+model CultureItemTranslation {
+  id            String      @id @default(cuid())
+  cultureItemId String
+  locale        Locale
+  name          String
+  summary       String
+  cultureItem   CultureItem @relation(fields: [cultureItemId], references: [id], onDelete: Cascade)
+
+  @@unique([cultureItemId, locale])
+}
+
+model Story {
+  id           String             @id @default(cuid())
+  slug         String             @unique
+  status       ContentStatus      @default(DRAFT)
+  isSample     Boolean            @default(false)
+  publishedAt  DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  translations StoryTranslation[]
+
+  @@index([status])  /// Optional cover image from the media library (never deleted while in use; SetNull is a safety net).
+  imageId      String?
+  image        MediaAsset? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+
+  @@index([imageId])
+}
+
+model StoryTranslation {
+  id      String @id @default(cuid())
+  storyId String
+  locale  Locale
+  title   String
+  excerpt String
+  body    String[]
+  story   Story  @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([storyId, locale])
+}
+
+// ---- Accounts (email + password). Passwords are stored as scrypt hashes only. ----
+
+model User {
+  id           String     @id @default(cuid())
+  /// Stored lowercase and trimmed.
+  email        String     @unique
+  name         String
+  passwordHash String
+  role         Role       @default(USER)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  sessions     Session[]
+  favorites    Favorite[]
+}
+
+/// Server-side session. The cookie holds a random token; only its SHA-256 hash is stored.
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Favorite {
+  userId        String
+  destinationId String
+  createdAt     DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, destinationId])
+  @@index([destinationId])
+}
+
+// ---- Media library. Image bytes live in PostgreSQL and are served by /media/<id>. ----
+// Every image needs alt text, a credit and a license: nothing is shown without its attribution.
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  /// image/jpeg, image/png or image/webp (detected from the file bytes, never from the file name).
+  mimeType     String
+  byteSize     Int
+  data         Bytes
+  altVi        String
+  altEn        String?
+  /// Photographer or rights holder.
+  credit       String
+  /// For example "CC BY 4.0", "Own work", "Used with permission".
+  license      String
+  sourceUrl    String?
+  createdAt    DateTime @default(now())
+  destinations Destination[]
+  foods        Food[]
+  cultureItems CultureItem[]
+  stories      Story[]
+
+  @@index([createdAt])
+}

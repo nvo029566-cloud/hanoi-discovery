@@ -1,0 +1,21 @@
+import type { Metadata } from "next";
+import { DestinationDetailPage, detailMetadata } from "@/components/pages/public-pages";
+import { getCatalog } from "@/lib/catalog";
+
+// Keep real 404 status codes for unknown slugs: allow a blocking route instead of a Suspense shell.
+export const instant = false;
+
+export async function generateStaticParams() {
+  const { destinations } = await getCatalog("en");
+  return destinations.map((item) => ({ slug: item.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps<"/en/destinations/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
+  return detailMetadata("destinations", "en", slug);
+}
+
+export default async function Page({ params }: PageProps<"/en/destinations/[slug]">) {
+  const { slug } = await params;
+  return <DestinationDetailPage locale="en" slug={slug} />;
+}

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0c2825" />
+      <stop offset="100%" stop-color="#061614" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f6e05e" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#aa820a" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="100" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="210" stroke="url(#gold)" stroke-width="6" fill="none" opacity="0.4" stroke-dasharray="8 8" />
+  <circle cx="256" cy="256" r="195" stroke="url(#gold)" stroke-width="2" fill="none" opacity="0.8" />
+  
+  <!-- Khuê Văn Các (Hanoi Emblem Stylized) -->
+  <g transform="translate(106, 100)" fill="url(#gold)">
+    <!-- Top Roof -->
+    <path d="M 150 20 L 50 70 L 250 70 Z" />
+    <path d="M 30 70 Q 150 50 270 70 L 250 82 Q 150 68 50 82 Z" />
+    <!-- Upper Level / Windows -->
+    <rect x="75" y="85" width="150" height="90" rx="6" />
+    <circle cx="150" cy="130" r="32" fill="#0c2825" />
+    <circle cx="150" cy="130" r="26" fill="none" stroke="url(#gold)" stroke-width="3" />
+    <line x1="150" y1="98" x2="150" y2="162" stroke="url(#gold)" stroke-width="3" />
+    <line x1="118" y1="130" x2="182" y2="130" stroke="url(#gold)" stroke-width="3" />
+    <line x1="127" y1="107" x2="173" y2="153" stroke="url(#gold)" stroke-width="2" />
+    <line x1="173" y1="107" x2="127" y2="153" stroke="url(#gold)" stroke-width="2" />
+    
+    <!-- Middle Roof -->
+    <path d="M 20 180 Q 150 160 280 180 L 265 195 Q 150 180 35 195 Z" />
+    
+    <!-- 4 Pillars -->
+    <rect x="65" y="195" width="22" height="90" rx="3" />
+    <rect x="105" y="195" width="20" height="90" rx="3" />
+    <rect x="175" y="195" width="20" height="90" rx="3" />
+    <rect x="213" y="195" width="22" height="90" rx="3" />
+    
+    <!-- Base Platform -->
+    <rect x="40" y="285" width="220" height="18" rx="4" />
+    <rect x="25" y="303" width="250" height="15" rx="3" />
+  </g>
+</svg>

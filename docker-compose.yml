@@ -1,0 +1,17 @@
+# Optional LOCAL PostgreSQL for development only. Credentials below are for a
+# throwaway local database; never reuse them anywhere else.
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hanoi
+      POSTGRES_PASSWORD: hanoi_dev_password
+      POSTGRES_DB: hanoi_discovery
+    ports:
+      - "5432:5432"
+    volumes:
+      - hanoi_pgdata:/var/lib/postgresql/data
+
+volumes:
+  hanoi_pgdata:

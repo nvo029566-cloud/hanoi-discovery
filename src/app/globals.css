@@ -1,26 +1,539 @@
 @import "tailwindcss";
 
+/* Design tokens: HANOI DISCOVERY - Royal Thăng Long Luxury Palette */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: only light;
+  --heritage-green: #1D3C34;
+  --heritage-green-dark: #142E27;
+  --heritage-green-hover: #35554B;
+
+  --heritage-gold: #D4A64B;
+  --heritage-gold-light: #E8C77B;
+  --heritage-gold-dark: #987022;
+
+  --ivory: #F5F1E8;
+  --surface: #FAF9F5;
+  --heritage-surface: #FAF8F2;
+  --white: #FFFFFF;
+
+  --text-primary: #1D3C34;
+  --text-secondary: #66736B;
+  --border-subtle: #DCD8CB;
+
+  --primary: #1D3C34;
+  /* Imperial Deep Emerald */
+  --primary-light: #35554B;
+  --primary-foreground: #ffffff;
+  --secondary: #D4A64B;
+  /* Royal Thăng Long Gold */
+  --secondary-light: #E8C77B;
+  --secondary-foreground: #1c1917;
+  --background: #FAF9F5;
+  /* Warm Ancient Parchment Ivory */
+  --surface: #ffffff;
+  --foreground: #1c2421;
+  /* Charcoal Slate */
+  --muted: #f0ede6;
+  /* Soft Mist */
+  --muted-foreground: #66736B;
+  --border: #DCD8CB;
+  --success: #1f7a4d;
+  --warning: #b45309;
+  --error: #b91c1c;
+  --focus: #D4A64B;
 }
 
 @theme inline {
+  --color-heritage-green: var(--heritage-green);
+  --color-heritage-green-dark: var(--heritage-green-dark);
+  --color-heritage-green-hover: var(--heritage-green-hover);
+  --color-heritage-gold: var(--heritage-gold);
+  --color-heritage-gold-light: var(--heritage-gold-light);
+  --color-heritage-gold-dark: var(--heritage-gold-dark);
+  --color-ivory: var(--ivory);
+  --color-heritage-surface: var(--heritage-surface);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-subtle: var(--border-subtle);
+
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-light: var(--secondary-light);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-focus: var(--focus);
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display Variable", ui-serif, Georgia, serif;
+
+  --radius-photo: 6px;
+  --radius-card: 14px;
+  --radius-button: 8px;
+  --radius-input: 8px;
+
+  --container-wide: 1600px;
+  --container-standard: 1440px;
+  --container-reading: 820px;
+  --container-compact: 520px;
+  --container-page: 1440px;
+
+  /* Fluid type (clamp) */
+  --text-hero: clamp(2.5rem, 1.2rem + 5.5vw, 5.25rem);
+  --text-section: clamp(1.85rem, 1.1rem + 2.8vw, 3.25rem);
+  --text-card: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  background: var(--background);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* Luxury card shadow */
+.shadow-luxury {
+  box-shadow: 0 10px 30px -5px rgba(10, 46, 42, 0.08), 0 4px 10px -2px rgba(10, 46, 42, 0.04);
+}
+
+.shadow-luxury-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shadow-luxury-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(10, 46, 42, 0.14), 0 8px 16px -4px rgba(10, 46, 42, 0.06);
+}
+
+/* Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 236, 232, 0.8);
+}
+
+.glass-dark {
+  background: rgba(10, 46, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+/* Spin slow */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes float-gently {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float-gently {
+  animation: float-gently 5s ease-in-out infinite;
+}
+
+.hover-shine {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.hover-shine::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: linear-gradient(115deg, transparent 25%, rgba(255, 255, 255, 0.35) 45%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hover-shine:hover::after,
+.hover-shine:focus-visible::after {
+  transform: translateX(120%);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Map pin (Leaflet divIcon) */
+.map-pin-wrapper {
+  background: transparent;
+  border: 0;
+}
+
+.map-pin {
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--primary);
+  border: 3px solid var(--secondary);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.3);
+}
+
+/* User location pulsating dot */
+.map-user-pin-wrapper {
+  background: transparent;
+  border: 0;
+}
+
+.map-user-dot {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4);
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+}
+
+/* Locate Me Button */
+.map-locate-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 34px !important;
+  height: 34px !important;
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s;
+}
+
+.map-locate-btn:hover {
+  background-color: #f8fafc !important;
+  color: var(--primary) !important;
+}
+
+/* Leaflet Custom Popup */
+.custom-map-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.22);
+}
+
+.custom-map-popup .leaflet-popup-content {
+  margin: 0;
+  line-height: 1.4;
+  font-family: inherit;
+}
+
+.map-popup-card {
+  width: 250px;
+}
+
+.map-popup-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 110px;
+  overflow: hidden;
+  background-color: #e2e8f0;
+}
+
+.map-popup-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.map-popup-content {
+  padding: 12px 14px 14px;
+}
+
+.map-popup-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.map-popup-badge {
+  margin: 4px 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b45309;
+}
+
+.map-popup-hours {
+  margin: 2px 0 10px;
+  font-size: 11px;
+  color: #64748b;
+}
+
+.map-popup-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.map-popup-link {
+  flex: 1;
+  text-align: center;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: none !important;
+  transition: all 0.15s;
+}
+
+.map-popup-link.primary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.map-popup-link.primary:hover {
+  opacity: 0.9;
+}
+
+.map-popup-link.secondary {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  background-color: #ffffff;
+}
+
+.map-popup-link.secondary:hover {
+  background-color: #f1f5f9;
+}
+
+/* ==========================================================================
+   Hanoi Discovery Transparent to Solid Sticky Header Styling
+   ========================================================================== */
+.header-sticky-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 40;
+  transition:
+    background-color 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 350ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: background-color, border-color, box-shadow;
+}
+
+/* Header in Transparent Mode (Hero top, scrollY <= 60px) */
+.header-mode-transparent {
+  background: rgba(20, 35, 29, 0.35) !important;
+  backdrop-filter: blur(16px) saturate(110%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(110%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  color: #F5F1E8 !important;
+}
+
+/* Header in Solid Mode (Scrolled > 60px or on subpages) */
+.header-mode-solid {
+  background: rgba(250, 249, 245, 0.98) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(29, 60, 52, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+  color: #1D3C34 !important;
+}
+
+/* Auth link styling: Section 3.3 - dedicated primary action button */
+.header-mode-transparent .auth-link-btn {
+  background-color: #F5F1E8 !important;
+  color: #1D3C34 !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.header-mode-transparent .auth-link-btn:hover {
+  background-color: #FFFFFF !important;
+  color: #142E27 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) !important;
+  transform: translateY(-1px);
+}
+
+.header-mode-solid .auth-link-btn {
+  background-color: #1D3C34 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #1D3C34 !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 8px rgba(29, 60, 52, 0.15) !important;
+  transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.header-mode-solid .auth-link-btn:hover {
+  background-color: #142E27 !important;
+  color: #FFFFFF !important;
+  border-color: #142E27 !important;
+  box-shadow: 0 4px 12px rgba(29, 60, 52, 0.25) !important;
+  transform: translateY(-1px);
+}
+
+/* Dropdown Animation (Fade-in + translateY(-8px to 0)) */
+@keyframes dropdownSlideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-anim {
+  animation: dropdownSlideFadeIn 250ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Dark Mega Menu Styling under Transparent Header */
+.header-mode-transparent .mega-menu-panel {
+  background-color: rgba(12, 38, 32, 0.97) !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #FAF8F3 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.header-mode-transparent .mega-menu-panel h4 {
+  color: #FAF8F3 !important;
+}
+
+.header-mode-transparent .mega-menu-panel a:hover h4 {
+  color: #E5B34E !important;
+}
+
+.header-mode-transparent .mega-menu-panel p {
+  color: #CBD5E1 !important;
+}
+
+.header-mode-transparent .mega-menu-panel a:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.header-mode-transparent .mega-menu-panel div[class*="border-b"] {
+  border-color: rgba(255, 255, 255, 0.16) !important;
+  color: #E5B34E !important;
+}
+
+.header-mode-transparent .mega-menu-panel div[class*="border-b"] svg {
+  color: #E5B34E !important;
+}
+
+.header-mode-transparent .mega-menu-panel span[class*="size-8"] {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5B34E !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .header-sticky-nav,
+  .auth-link-btn,
+  .dropdown-anim,
+  .hero-photo-cover {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Hero Cinematic Ultra-Sharp Photo Framing (No pixelation scale distortion) */
+.hero-photo-cover {
+  object-fit: cover;
+  object-position: center 38%;
+  transform: none !important;
+}
+
+@media (min-width: 1024px) {
+  .hero-photo-cover {
+    object-position: 45% 35%;
+  }
+}
+
+/* Master Editorial Scrim: Radial Vignette behind text + Balanced vertical gradient */
+.hero-editorial-overlay {
+  background: radial-gradient(
+      ellipse 75% 60% at 50% 38%,
+      rgba(6, 20, 16, 0.65) 0%,
+      rgba(6, 20, 16, 0.35) 60%,
+      transparent 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(8, 24, 19, 0.45) 0%,
+      rgba(8, 24, 19, 0.25) 35%,
+      rgba(8, 24, 19, 0.5) 65%,
+      rgba(8, 24, 19, 0.88) 100%
+    );
 }
