@@ -7,6 +7,7 @@ import { motion, useScroll, useTransform, useReducedMotion } from "motion/react"
 import { ArrowRight, Bookmark, ChevronDown, Clock, Share2, Ticket } from "lucide-react";
 import { localePath, type Locale } from "@/i18n/locales";
 import type { Destination } from "@/types/content";
+import { HeritageTrailBackground } from "./heritage-trail-background";
 
 interface HeritageTrailShowcaseProps {
   locale?: Locale;
@@ -44,6 +45,27 @@ interface TrailConnectorProps {
  * activates the center marker node with a smooth transition from neutral to heritage gold,
  * and rolls back bidirectionally when the user scrolls upwards without any scroll-locking.
  */
+/** Photo that drifts slightly against the scroll, giving the card depth. Static when motion is reduced. */
+function ParallaxImage({ src, alt }: { src: string; alt: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  return (
+    <div ref={ref} className="absolute inset-0 overflow-hidden">
+      <motion.div style={reduce ? undefined : { y, scale: 1.14 }} className="absolute inset-0">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 768px) 100vw, 500px"
+          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+      </motion.div>
+    </div>
+  );
+}
+
 function TrailConnector({ id, reverse }: TrailConnectorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
@@ -120,7 +142,7 @@ function TrailConnector({ id, reverse }: TrailConnectorProps) {
             />
             <circle cx={endDot.x} cy={endDot.y} r="3.5" fill="#B48A35" />
           </svg>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-7 rounded-full border border-[#B48A35] bg-[#FAF8F2] shadow-xs flex items-center justify-center text-[#B48A35]">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-7 rounded-full border border-[#B48A35] bg-[#F8F4EB] shadow-xs flex items-center justify-center text-[#B48A35]">
             <ChevronDown className="size-3.5" />
           </div>
         </div>
@@ -194,7 +216,7 @@ function TrailConnector({ id, reverse }: TrailConnectorProps) {
 
         {/* Center Circular Marker: Transitions from neutral to gold with soft glow */}
         <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-7 rounded-full bg-[#FAF8F2] flex items-center justify-center transition-colors duration-300"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-7 rounded-full bg-[#F8F4EB] flex items-center justify-center transition-colors duration-300"
           style={{
             borderColor: markerBorder,
             borderWidth: "1.5px",
@@ -257,7 +279,7 @@ function TrailConnector({ id, reverse }: TrailConnectorProps) {
 
         {/* Mobile Center Circular Marker */}
         <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-6 rounded-full bg-[#FAF8F2] flex items-center justify-center transition-colors duration-300"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-6 rounded-full bg-[#F8F4EB] flex items-center justify-center transition-colors duration-300"
           style={{
             borderColor: markerBorder,
             borderWidth: "1.5px",
@@ -363,19 +385,20 @@ export function HeritageTrailShowcase({ locale = "vi", destinations = [] }: Heri
       reverse: false,
     },
   ];
+  const routeSlugs = stops.flatMap((stop) => {
+    const place = destinations.find((item) => stop.href === `/destinations/${item.slug}`);
+    return place ? [place.slug] : [];
+  });
 
   return (
     <section
       id="heritage-trail"
-      className="relative overflow-hidden bg-[#FAF8F2] pt-2 sm:pt-4 lg:pt-6 pb-16 sm:pb-20 lg:pb-24 text-[#1C2D27] scroll-mt-20"
+      className="home-chapter-target relative isolate overflow-hidden pt-6 pb-16 text-[#1C2D27] sm:pt-8 sm:pb-20 lg:pt-10 lg:pb-24"
     >
-      {/* Background Subtle Watermark/Noise Texture */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.025] bg-[radial-gradient(#1D3C34_1px,transparent_1px)] [background-size:24px_24px]"
-      />
+      {/* Rich Cultural Heritage & Topographic Cartography Background */}
+      <HeritageTrailBackground isEn={isEn} />
 
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
           initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -413,8 +436,8 @@ export function HeritageTrailShowcase({ locale = "vi", destinations = [] }: Heri
           {/* Subtitle */}
           <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#5A6860] font-light max-w-xl mx-auto">
             {isEn
-              ? "Follow historic paths, listen to timeless tales, and embrace the essence of the capital at every stop."
-              : "Theo dấu những con đường, lắng nghe những câu chuyện và cảm nhận vẻ đẹp của thủ đô qua từng điểm dừng."}
+              ? "Allow half a day: walk from Hoan Kiem Lake to the Old Quarter, then take a bus or taxi to the Temple of Literature."
+              : "Gợi ý nửa ngày: đi bộ từ Hồ Hoàn Kiếm đến Phố cổ, sau đó đi xe buýt hoặc taxi tới Văn Miếu."}
           </p>
         </motion.div>
 
@@ -452,13 +475,7 @@ export function HeritageTrailShowcase({ locale = "vi", destinations = [] }: Heri
                   >
                     <div className="group block">
                       <div className="relative aspect-[16/10] sm:aspect-[16/10.5] overflow-hidden rounded-[20px] border border-[#E4DDD0] bg-[#EBE5D9] shadow-lg shadow-[#1D3C34]/8 transition-all duration-500 ease-out hover:shadow-xl hover:shadow-[#1D3C34]/12 hover:border-[#D5CBB9]">
-                        <Image
-                          src={stop.image}
-                          alt={isEn ? stop.captionEn : stop.captionVi}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 500px"
-                          className="size-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
+                        <ParallaxImage src={stop.image} alt={isEn ? stop.captionEn : stop.captionVi} />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none opacity-60 group-hover:opacity-40 transition-opacity" />
 
                         {/* Top-Right Quick Action Badge (Share & Bookmark) */}
@@ -538,12 +555,12 @@ export function HeritageTrailShowcase({ locale = "vi", destinations = [] }: Heri
 
                     {/* Main Title */}
                     <h3 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#1D3C34] leading-snug mb-1">
-                      {isEn ? stop.titleEn : stop.titleVi}
+                      {isEn ? stop.subtitleEn : stop.subtitleVi}
                     </h3>
 
                     {/* Location Subtitle */}
                     <p className="text-sm font-medium text-[#8C7A65] mb-3">
-                      {isEn ? stop.subtitleEn : stop.subtitleVi}
+                      {isEn ? stop.titleEn : stop.titleVi}
                     </p>
 
                     {/* Description */}
@@ -609,10 +626,12 @@ export function HeritageTrailShowcase({ locale = "vi", destinations = [] }: Heri
           className="mt-12 sm:mt-16 flex justify-center"
         >
           <Link
-            href={localePath(locale, "/destinations")}
+            href={routeSlugs.length > 1
+              ? localePath(locale, "/map") + "?" + new URLSearchParams({ route: routeSlugs.join(",") })
+              : localePath(locale, "/map")}
             className="group inline-flex items-center gap-2.5 rounded-xl bg-[#1D3C34] px-7 py-3 sm:py-3.5 text-sm sm:text-base font-semibold text-[#FAF8F5] shadow-md shadow-[#1D3C34]/15 transition-all duration-300 hover:bg-[#142B24] hover:shadow-lg hover:shadow-[#1D3C34]/25 hover:-translate-y-0.5 active:translate-y-0"
           >
-            <span>{isEn ? "Explore full journey" : "Khám phá toàn bộ hành trình"}</span>
+            <span>{isEn ? "View on the map" : "Xem hành trình trên bản đồ"}</span>
             <ArrowRight className="size-4.5 transition-transform duration-300 group-hover:translate-x-1 text-[#E5B34E]" />
           </Link>
         </motion.div>

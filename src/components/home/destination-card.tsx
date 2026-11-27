@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Star, Ticket } from "lucide-react";
+import { ArrowRight, Ticket } from "lucide-react";
 import { CoverImage } from "@/components/ui/cover-image";
 import { ThreeDCard } from "@/components/ui/three-d-card";
 import { localePath, type Locale } from "@/i18n/locales";
@@ -44,14 +44,6 @@ export function DestinationCard({
               </span>
             </div>
           )}
-
-          {/* Floating Rating or Free Ticket Pill */}
-          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
-            <span className="inline-flex items-center gap-1 rounded-full bg-black/65 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-white border border-white/20 shadow-xs">
-              <Star className="size-3 fill-amber-400 text-amber-400" />
-              <span>4.9</span>
-            </span>
-          </div>
 
           {/* Bottom Badge Over Image */}
           <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between text-xs text-white/90">

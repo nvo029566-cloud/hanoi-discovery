@@ -30,11 +30,13 @@ export function HanoiMap({
   points,
   locale = "vi",
   selectedSlug,
+  showRoute = false,
   onSelectPoint,
 }: {
   points: MappableDestination[];
   locale?: Locale;
   selectedSlug?: string;
+  showRoute?: boolean;
   onSelectPoint?: (slug: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -114,11 +116,21 @@ export function HanoiMap({
     });
 
     // Add Markers
-    for (const p of points) {
+    for (const [index, p] of points.entries()) {
+      const routeNumber = showRoute ? index + 1 : null;
+      const markerLabel = routeNumber ? `${routeNumber}. ${p.name}` : p.name;
       const marker = L.marker([p.latitude, p.longitude], {
-        icon: pinIcon,
-        title: p.name,
-        alt: p.name,
+        icon: routeNumber
+          ? L.divIcon({
+              className: "map-route-pin",
+              html: `<span aria-hidden="true">${routeNumber}</span>`,
+              iconSize: [30, 30],
+              iconAnchor: [15, 15],
+              popupAnchor: [0, -15],
+            })
+          : pinIcon,
+        title: markerLabel,
+        alt: markerLabel,
       }).addTo(map);
 
       const photo = getLocalPhoto(p.slug);
@@ -149,6 +161,9 @@ export function HanoiMap({
       markersRef.current.set(p.slug, marker);
     }
 
+    if (showRoute && positions.length > 1) {
+      L.polyline(positions, { color: "#775718", weight: 3, dashArray: "6 8", interactive: false }).addTo(map);
+    }
     // Fit bounds if multiple points
     if (positions.length > 1) {
       map.fitBounds(positions, { padding: [40, 40] });
@@ -164,7 +179,7 @@ export function HanoiMap({
         delete (container as unknown as { _leaflet_id?: number })._leaflet_id;
       }
     };
-  }, [points, locale, m.common.viewDetails, onSelectPoint]);
+  }, [points, locale, m.common.viewDetails, onSelectPoint, showRoute]);
 
   // Focus selected marker if selectedSlug changes
   useEffect(() => {

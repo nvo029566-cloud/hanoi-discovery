@@ -26,6 +26,7 @@ export interface Destination {
   name: string;
   category: string;
   summary: string;
+  isSample?: boolean;
   /** Only set when a verified source exists (see sourceUrl). */
   latitude?: number | null;
   longitude?: number | null;

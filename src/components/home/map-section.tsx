@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { ArrowRight, Compass, MapPin } from "lucide-react";
 import { PlacesMap } from "@/components/map/places-map";
 import { SectionHeading } from "@/components/ui/section-heading";
@@ -44,7 +45,9 @@ export function MapSection({
 
       {/* Luxury Map Container */}
       <div className="rounded-[24px] overflow-hidden border border-border shadow-xl bg-surface">
-        <PlacesMap destinations={destinations} categories={categories} locale={locale} />
+        <Suspense fallback={<p className="p-6 text-muted-foreground">{getMessages(locale).common.loading}</p>}>
+          <PlacesMap destinations={destinations} categories={categories} locale={locale} />
+        </Suspense>
       </div>
 
       {/* Map Footer Note */}

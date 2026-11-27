@@ -29,19 +29,24 @@ export function ImagePlaceholder({
   const photo = getLocalPhoto(slug);
 
   if (photo) {
+    const isEn = locale === "en";
+    const illustrationLabel = locale === "en" ? "AI illustration" : "Minh họa bằng AI";
+    const imageCredit = photo.illustration
+      ? `${illustrationLabel} · ${photo.credit}`
+      : m.common.photoCredit(photo.credit);
     const picture = (
       <div className={cn("relative overflow-hidden bg-surface group", className)}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photo.src}
-          alt={label}
+          alt={photo.illustration ? `${label} — ${illustrationLabel}` : label}
           loading="lazy"
           decoding="async"
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
         {!caption && (
           <span className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] truncate rounded bg-black/60 backdrop-blur-xs px-2 py-0.5 text-[11px] font-medium text-white shadow-xs">
-            {m.common.photoCredit(photo.credit)}
+            {imageCredit}
           </span>
         )}
       </div>
@@ -53,16 +58,24 @@ export function ImagePlaceholder({
       <figure>
         {picture}
         <figcaption className="mt-2 text-sm text-muted-foreground">
-          {m.common.photoCredit(photo.credit)} · {photo.license}
-          {" · "}
-          <a
-            href={photo.sourceUrl}
-            rel="noopener noreferrer nofollow"
-            target="_blank"
-            className="underline underline-offset-4"
-          >
-            {m.common.sourceLabel}
-          </a>
+          {imageCredit}
+          {photo.license && (
+            <>
+              {" · "}
+              {photo.licenseUrl
+                ? <a href={photo.licenseUrl} className="underline underline-offset-4">{photo.license}</a>
+                : photo.license}
+            </>
+          )}
+          {photo.cropped && (isEn ? " · Cropped" : " · Đã cắt khung")}
+          {photo.sourceUrl && (
+            <>
+              {" · "}
+              <a href={photo.sourceUrl} rel="noopener noreferrer nofollow" target="_blank" className="underline underline-offset-4">
+                {m.common.sourceLabel}
+              </a>
+            </>
+          )}
         </figcaption>
       </figure>
     );

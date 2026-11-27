@@ -1,5 +1,6 @@
 // DỮ LIỆU MẪU phát triển & cổng thông tin chuẩn quốc tế
 import type { Category, CultureItem, Destination, Food, Story } from "@/types/content";
+import { oldQuarterLocation } from "./old-quarter-location";
 
 export const sampleCategories: Category[] = [
   { slug: "history-heritage", name: "Lịch sử & Di sản", description: "Hoàng thành, đền chùa và những con phố cũ lưu giữ câu chuyện của thành phố." },
@@ -38,11 +39,9 @@ export const sampleDestinations: Destination[] = [
     name: "Phố cổ Hà Nội",
     category: "local-experiences",
     summary: "Mạng lưới 36 phố phường lịch sử, cái nôi gìn giữ nghề thủ công truyền thống, kiến trúc nhà ống đặc trưng và văn hóa ẩm thực hè phố đậm chất Tràng An.",
-    latitude: null,
-    longitude: null,
+    ...oldQuarterLocation,
     openingHours: "Mở cửa cả ngày (Chợ đêm & phố đi bộ ẩm thực: 18:00 – 23:00 Thứ Sáu – Chủ Nhật)",
     ticketInfo: "Miễn phí tham quan",
-    sourceUrl: "https://hanoi.gov.vn",
   },
   {
     slug: "west-lake",

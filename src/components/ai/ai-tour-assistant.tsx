@@ -362,13 +362,9 @@ export function AITourAssistant({ locale }: { locale?: Locale }) {
           }}
           aria-label={isEn ? "Open AI Travel Assistant" : "Mở Trợ lý khám phá Hà Nội"}
           title={isEn ? "AI Travel Assistant - Click to chat" : "AI Travel Assistant - Trợ lý khám phá Hà Nội"}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 flex size-12 items-center justify-center rounded-full bg-[#0a2e2a] border-2 border-amber-400/70 text-amber-300 shadow-2xl backdrop-blur-xl transition-all duration-300 hover:scale-110 hover:border-amber-300 hover:shadow-[0_8px_25px_rgba(212,175,55,0.4)] group active:scale-95 cursor-pointer"
+          className="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 grid size-11 place-items-center rounded-full border border-amber-400/70 bg-[#0a2e2a] text-amber-300 shadow-lg transition-colors hover:border-amber-300 md:right-6 md:bottom-6"
         >
-          <Sparkles className="size-5 transition-transform group-hover:rotate-12 group-hover:scale-110 text-amber-300" />
-          <span className="absolute -top-1 -right-1 flex size-3">
-            <span className="animate-ping absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex size-3 rounded-full bg-emerald-500 border border-white" />
-          </span>
+          <Sparkles className="size-5" aria-hidden="true" />
         </button>
       )}
 
@@ -377,7 +373,7 @@ export function AITourAssistant({ locale }: { locale?: Locale }) {
         <div
           role="region"
           aria-label="AI Travel Assistant"
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 inline-flex items-center gap-2.5 rounded-full bg-[#071f1c]/95 border border-amber-400/50 p-1.5 pr-3 text-white shadow-2xl backdrop-blur-xl transition-all duration-300 hover:border-amber-400 hover:shadow-[0_10px_30px_rgba(212,175,55,0.25)] group"
+          className="group fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-40 inline-flex items-center gap-2.5 rounded-full border border-amber-400/50 bg-[#071f1c]/95 p-1 text-white shadow-lg transition-colors hover:border-amber-400 md:right-6 md:bottom-6 md:p-1.5 md:pr-3"
         >
           <button
             type="button"
@@ -388,12 +384,11 @@ export function AITourAssistant({ locale }: { locale?: Locale }) {
             <span className="flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 group-hover:bg-amber-400 group-hover:text-stone-950 transition-all duration-300 shadow-inner">
               <Sparkles className="size-4 sm:size-5 transition-transform group-hover:rotate-12" />
             </span>
-            <div className="hidden sm:block">
+            <div className="hidden md:block">
               <div className="flex items-center gap-1.5">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-amber-300 leading-tight">
                   AI Travel Assistant
                 </p>
-                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
               </div>
               <p className="text-xs text-white/90 font-medium leading-tight mt-0.5">
                 {isEn ? "Hanoi Discovery Concierge" : "Trợ lý khám phá Hà Nội"}
@@ -407,7 +402,7 @@ export function AITourAssistant({ locale }: { locale?: Locale }) {
             onClick={() => setIsMinimized(true)}
             aria-label={isEn ? "Minimize to icon" : "Thu nhỏ thành biểu tượng"}
             title={isEn ? "Minimize" : "Thu nhỏ"}
-            className="hidden sm:inline-flex size-6 items-center justify-center rounded-full text-white/50 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="hidden size-6 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
           >
             <Minus className="size-3.5" />
           </button>
@@ -419,7 +414,7 @@ export function AITourAssistant({ locale }: { locale?: Locale }) {
         <div
           role="dialog"
           aria-label="AI Travel Assistant"
-          className="fixed bottom-4 right-4 z-50 flex flex-col w-[92vw] sm:w-[420px] h-[580px] max-h-[85vh] rounded-3xl bg-surface border border-border shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 duration-200 text-foreground"
+          className="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-50 flex h-[580px] max-h-[calc(100dvh-11rem)] w-[min(calc(100vw-2rem),420px)] flex-col overflow-hidden rounded-3xl border border-border bg-surface text-foreground shadow-2xl motion-safe:animate-in motion-safe:slide-in-from-bottom-5 md:bottom-6 md:max-h-[85dvh]"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3.5 bg-brand-emerald-dark border-b border-amber-500/30 text-brand-cream">

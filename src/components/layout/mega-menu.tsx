@@ -16,19 +16,17 @@ import {
 import { localePath, type Locale } from "@/i18n/locales";
 
 interface MegaMenuProps {
+  id: string;
   activeHref: string | null;
   locale: Locale;
   onClose: () => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
 }
 
 export function MegaMenu({
+  id,
   activeHref,
   locale,
   onClose,
-  onMouseEnter,
-  onMouseLeave,
 }: MegaMenuProps) {
   const isEn = locale === "en";
 
@@ -38,10 +36,9 @@ export function MegaMenu({
 
   return (
     <div
+      id={id}
       role="region"
       aria-label={isEn ? "Submenu navigation" : "Menu điều hướng chuyên sâu"}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
       className="absolute inset-x-0 top-full z-50 pt-2 dropdown-anim"
     >
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
@@ -49,6 +46,10 @@ export function MegaMenu({
           {/* DESTINATIONS MEGA MENU */}
           {activeHref === "/destinations" && (
             <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-12">
+              <Link href={localePath(locale, "/map")} onClick={onClose} className="inline-flex min-h-11 items-center gap-2 font-semibold underline underline-offset-4 lg:col-span-12">
+                <MapPin className="size-4" aria-hidden="true" />
+                {isEn ? "Explore the map" : "Xem bản đồ Hà Nội"}
+              </Link>
               {/* Column 1: Heritage & Monuments */}
               <div className="lg:col-span-4 flex flex-col space-y-3">
                 <div className="flex items-center gap-2 pb-1 border-b border-[#DEDAD1] text-xs font-bold uppercase tracking-wider text-[#233B32]">

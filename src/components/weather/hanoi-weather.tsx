@@ -4,163 +4,86 @@ import { useEffect, useState } from "react";
 import type { Locale } from "@/i18n/locales";
 
 interface WeatherData {
-  temp: number;
-  feelsLike: number;
-  humidity: number;
-  windSpeed: number;
-  conditionVi: string;
-  conditionEn: string;
-  icon: string;
-  adviceVi: string;
-  adviceEn: string;
-  aqi: number;
-  aqiStatusVi: string;
-  aqiStatusEn: string;
+  time: string;
+  temperature_2m: number;
+  apparent_temperature: number;
+  relative_humidity_2m: number;
+  wind_speed_10m: number;
+  weather_code: number;
 }
 
-const FALLBACK_WEATHER: WeatherData = {
-  temp: 24,
-  feelsLike: 25,
-  humidity: 72,
-  windSpeed: 12,
-  conditionVi: "Nắng nhẹ & mát mẻ",
-  conditionEn: "Mild & pleasant sunshine",
-  icon: "🌤️",
-  adviceVi: "Thời tiết lý tưởng để dạo quanh Hồ Gươm, thưởng thức cà phê vỉa hè và khám phá phố cổ.",
-  adviceEn: "Ideal weather for a stroll around Hoan Kiem Lake, curbside coffee, and exploring the Old Quarter.",
-  aqi: 65,
-  aqiStatusVi: "Trung bình (Thích hợp dạo phố)",
-  aqiStatusEn: "Moderate (Good for outdoor walk)",
-};
-
-function parseWmoCode(code: number): { vi: string; en: string; icon: string } {
-  if (code === 0) return { vi: "Trời quang đãng", en: "Clear sky", icon: "☀️" };
-  if (code <= 3) return { vi: "Có mây nhẹ", en: "Partly cloudy", icon: "🌤️" };
-  if (code === 45 || code === 48) return { vi: "Sương mù bảng lảng", en: "Misty & Foggy", icon: "🌫️" };
-  if (code >= 51 && code <= 55) return { vi: "Mưa phùn nhẹ", en: "Light drizzle", icon: "🌦️" };
-  if (code >= 61 && code <= 65) return { vi: "Có mưa rải rác", en: "Scattered rain", icon: "🌧️" };
-  if (code >= 80 && code <= 82) return { vi: "Mưa rào thoáng qua", en: "Passing rain showers", icon: "🌦️" };
-  if (code >= 95) return { vi: "Có dông", en: "Thunderstorm", icon: "⛈️" };
-  return { vi: "Thời tiết êm dịu", en: "Mild weather", icon: "⛅" };
+function weatherLabel(code: number, isEn: boolean) {
+  if (code === 0) return isEn ? "Clear sky" : "Trời quang";
+  if (code <= 3) return isEn ? "Cloudy" : "Có mây";
+  if (code === 45 || code === 48) return isEn ? "Fog" : "Có sương mù";
+  if (code >= 95) return isEn ? "Thunderstorm" : "Có dông";
+  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return isEn ? "Rain" : "Có mưa";
+  return isEn ? "Variable conditions" : "Thời tiết thay đổi";
 }
 
 export function HanoiWeatherWidget({ locale = "vi" }: { locale?: Locale }) {
-  const [weather, setWeather] = useState<WeatherData>(FALLBACK_WEATHER);
+  const [weather, setWeather] = useState<WeatherData | null>(null);
+  const [failed, setFailed] = useState(false);
+  const isEn = locale === "en";
 
   useEffect(() => {
-    let mounted = true;
-    async function fetchWeather() {
+    const controller = new AbortController();
+    async function loadWeather() {
       try {
-        const res = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=21.0285&longitude=105.8542&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m",
-          { cache: "no-store" }
+        const response = await fetch(
+          "https://api.open-meteo.com/v1/forecast?latitude=21.0285&longitude=105.8542&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FBangkok",
+          { signal: controller.signal },
         );
-        if (!res.ok) throw new Error("Weather request failed");
-        const json = await res.json();
-        const current = json.current;
-        if (!current) throw new Error("No current data");
-
-        const cond = parseWmoCode(current.weather_code ?? 0);
-        const temp = Math.round(current.temperature_2m);
-        const feelsLike = Math.round(current.apparent_temperature ?? temp);
-        const humidity = Math.round(current.relative_humidity_2m ?? 70);
-        const windSpeed = Math.round(current.wind_speed_10m ?? 10);
-
-        let adviceVi = "Thời tiết tuyệt vời để ghé thăm các di tích ngoài trời và thưởng thức ẩm thực hè phố.";
-        let adviceEn = "Great weather for outdoor monuments and vibrant street food discovery.";
-        if (temp > 30) {
-          adviceVi = "Trời ấm nóng, bạn nên mang theo mũ nón, nước uống và ghé thăm bảo tàng vào buổi trưa.";
-          adviceEn = "Warm day: carry water, sunscreen, and visit indoor museums during midday hours.";
-        } else if (temp < 18) {
-          adviceVi = "Trời se lạnh, nhớ khoác thêm áo ấm nhẹ khi dạo phố đêm và nhâm nhi một bát phở nóng.";
-          adviceEn = "Cool weather: bring a light jacket for evening strolls and enjoy a steaming bowl of pho.";
+        if (!response.ok) throw new Error("Weather request failed");
+        const { current } = await response.json() as { current?: WeatherData };
+        if (!current || typeof current.time !== "string"
+          || ![current.temperature_2m, current.apparent_temperature, current.relative_humidity_2m, current.wind_speed_10m, current.weather_code].every(Number.isFinite)) {
+          throw new Error("Incomplete current weather");
         }
-
-        if (mounted) {
-          setWeather({
-            temp,
-            feelsLike,
-            humidity,
-            windSpeed,
-            conditionVi: cond.vi,
-            conditionEn: cond.en,
-            icon: cond.icon,
-            adviceVi,
-            adviceEn,
-            aqi: 68,
-            aqiStatusVi: "Trung bình (Thích hợp dạo chơi)",
-            aqiStatusEn: "Moderate (Great for walking)",
-          });
-        }
+        setWeather(current);
       } catch {
-        // use fallback weather
+        if (!controller.signal.aborted) setFailed(true);
       }
     }
 
-    fetchWeather();
-    return () => {
-      mounted = false;
-    };
+    void loadWeather();
+    return () => controller.abort();
   }, []);
 
   return (
-    <div className="relative overflow-hidden rounded-[20px] border border-border/80 bg-gradient-to-br from-surface to-background p-6 shadow-sm">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        {/* Left: Location & Current Temp */}
-        <div className="flex items-center gap-4">
-          <span className="text-4xl sm:text-5xl" aria-hidden="true">
-            {weather.icon}
-          </span>
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span className="font-serif text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
-                {weather.temp}°C
-              </span>
-              <span className="text-xs font-semibold text-muted-foreground">
-                {locale === "vi" ? `(Cảm giác như ${weather.feelsLike}°C)` : `(Feels like ${weather.feelsLike}°C)`}
-              </span>
-            </div>
-            <p className="mt-0.5 text-sm font-medium text-primary">
-              {locale === "vi" ? weather.conditionVi : weather.conditionEn}
-              {" • "}
-              <span className="text-muted-foreground">Hà Nội</span>
+    <section aria-label={isEn ? "Hanoi weather" : "Thời tiết Hà Nội"} className="rounded-2xl border border-border bg-surface p-5 shadow-sm sm:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 className="font-serif text-xl font-semibold">{isEn ? "Hanoi weather" : "Thời tiết Hà Nội"}</h2>
+          {weather ? (
+            <p className="mt-1 text-sm text-muted-foreground">
+              <strong className="mr-2 text-2xl text-primary">{Math.round(weather.temperature_2m)}°C</strong>
+              {weatherLabel(weather.weather_code, isEn)}
             </p>
-          </div>
+          ) : (
+            <p role="status" className="mt-2 text-sm text-muted-foreground">
+              {failed
+                ? (isEn ? "Current weather is unavailable." : "Chưa lấy được dữ liệu thời tiết hiện tại.")
+                : (isEn ? "Loading current conditions…" : "Đang tải thời tiết hiện tại…")}
+            </p>
+          )}
         </div>
-
-        {/* Right: Key metrics */}
-        <div className="grid grid-cols-3 gap-3 border-t border-border pt-4 sm:border-t-0 sm:pt-0 sm:border-l sm:pl-6 text-center">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {locale === "vi" ? "Độ ẩm" : "Humidity"}
-            </p>
-            <p className="mt-1 text-sm font-bold text-foreground">{weather.humidity}%</p>
-          </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {locale === "vi" ? "Gió" : "Wind"}
-            </p>
-            <p className="mt-1 text-sm font-bold text-foreground">{weather.windSpeed} km/h</p>
-          </div>
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              AQI
-            </p>
-            <p className="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
-              {weather.aqi}
-            </p>
-          </div>
-        </div>
+        {weather && (
+          <dl className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+            <div><dt className="text-muted-foreground">{isEn ? "Feels like" : "Cảm giác như"}</dt><dd className="font-semibold">{Math.round(weather.apparent_temperature)}°C</dd></div>
+            <div><dt className="text-muted-foreground">{isEn ? "Humidity" : "Độ ẩm"}</dt><dd className="font-semibold">{weather.relative_humidity_2m}%</dd></div>
+            <div><dt className="text-muted-foreground">{isEn ? "Wind" : "Gió"}</dt><dd className="font-semibold">{Math.round(weather.wind_speed_10m)} km/h</dd></div>
+          </dl>
+        )}
       </div>
-
-      {/* Travel advice recommendation */}
-      <div className="mt-4 flex items-start gap-2 rounded-[12px] bg-primary/5 px-3.5 py-2.5 text-xs text-foreground/90 border border-primary/10">
-        <span className="text-sm">💡</span>
-        <p className="leading-relaxed">
-          <strong className="text-primary">{locale === "vi" ? "Gợi ý du lịch:" : "Travel Tip:"} </strong>
-          {locale === "vi" ? weather.adviceVi : weather.adviceEn}
-        </p>
-      </div>
-    </div>
+      <p className="mt-4 text-xs text-muted-foreground">
+        <a href="https://open-meteo.com/" className="underline underline-offset-2">Open-Meteo</a>
+        {weather && (
+          <> · {isEn ? "Data time" : "Thời điểm dữ liệu"}{" "}
+            <time dateTime={weather.time + "+07:00"}>{weather.time.replace("T", " ")} (UTC+7)</time>
+          </>
+        )}
+      </p>
+    </section>
   );
 }

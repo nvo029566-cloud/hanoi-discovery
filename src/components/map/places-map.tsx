@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { MapLoader } from "@/components/map/map-loader";
 import { localePath, type Locale } from "@/i18n/locales";
@@ -20,11 +21,21 @@ export function PlacesMap({
   locale?: Locale;
 }) {
   const m = getMessages(locale).map;
+  const params = useSearchParams();
+  const focusSlug = params.get("place") ?? undefined;
+  const route = params.get("route") ?? "";
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedSlug, setSelectedSlug] = useState<string | undefined>(undefined);
   const [query, setQuery] = useState("");
 
-  const allPoints = withCoordinates(destinations);
+  const allPoints = useMemo(() => withCoordinates(destinations), [destinations]);
+  const routeSlugs = useMemo(() => [...new Set(route.split(",").filter(Boolean).slice(0, 10))], [route]);
+  const routePoints = useMemo(
+    () => routeSlugs.flatMap((slug) => allPoints.find((point) => point.slug === slug) ?? []),
+    [allPoints, routeSlugs],
+  );
+  const showingRoute = routeSlugs.length > 1;
+  const completeRoute = routePoints.length === routeSlugs.length;
   const normalizedQuery = query.trim().toLocaleLowerCase();
   const displayedPoints = useMemo(
     () => allPoints.filter((p) => {
@@ -33,10 +44,24 @@ export function PlacesMap({
     }),
     [allPoints, normalizedQuery, selectedCategory],
   );
-  const displayedSlugs = new Set(displayedPoints.map((point) => point.slug));
+  const mapPoints = showingRoute ? routePoints : displayedPoints;
+  const activeSlug = selectedSlug ?? (showingRoute ? undefined : focusSlug);
 
   return (
     <div className="mt-8 space-y-6">
+      {showingRoute ? (
+        <div className="rounded-2xl border border-border bg-surface p-4">
+          <h2 className="font-serif text-xl font-semibold">{locale === "vi" ? "Các điểm dừng của hành trình" : "Itinerary stops"}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {completeRoute
+              ? (locale === "vi" ? "Đường nét đứt nối các điểm theo thứ tự." : "The dashed line connects the stops in order.")
+              : (locale === "vi" ? `Có tọa độ cho ${routePoints.length}/${routeSlugs.length} điểm dừng.` : `Coordinates are available for ${routePoints.length} of ${routeSlugs.length} stops.`)}
+          </p>
+          <Link href={localePath(locale, "/map")} className="mt-2 inline-block text-sm font-semibold text-primary underline">
+            {locale === "vi" ? "Xem tất cả địa danh" : "Show all places"}
+          </Link>
+        </div>
+      ) : (
       <div className="rounded-[22px] border border-border/80 bg-surface p-4 shadow-sm md:p-5">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -99,16 +124,18 @@ export function PlacesMap({
           })}
         </div>
       </div>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_22rem]">
         <div className="isolate relative z-0">
-          {displayedPoints.length > 0 ? (
+          {mapPoints.length > 0 ? (
             <div role="region" aria-label={m.region}>
               <MapLoader
-                points={displayedPoints}
+                points={mapPoints}
                 locale={locale}
-                selectedSlug={selectedSlug}
-                onSelectPoint={(slug) => setSelectedSlug(slug)}
+                selectedSlug={activeSlug}
+                showRoute={showingRoute && completeRoute}
+                onSelectPoint={setSelectedSlug}
               />
             </div>
           ) : (
@@ -122,13 +149,12 @@ export function PlacesMap({
           <div className="flex items-center justify-between">
             <h3 className="font-serif text-xl">{m.listTitle}</h3>
             <span className="text-xs text-muted-foreground font-medium">
-              {displayedPoints.length} / {destinations.length}
+              {mapPoints.length} / {destinations.length}
             </span>
           </div>
           <ul className="mt-4 max-h-[32rem] space-y-3 overflow-y-auto pr-1">
-            {destinations.filter((d) => displayedSlugs.has(d.slug)).map((d) => {
-              const onMap = allPoints.some((p) => p.slug === d.slug);
-              const isSelected = selectedSlug === d.slug;
+            {mapPoints.map((d) => {
+              const isSelected = activeSlug === d.slug;
               return (
                 <li
                   key={d.slug}
@@ -144,30 +170,23 @@ export function PlacesMap({
                         href={localePath(locale, `/destinations/${d.slug}`)}
                         className="font-semibold text-primary underline decoration-secondary decoration-2 underline-offset-4 hover:text-primary/80"
                       >
-                        {d.name}
+                        {showingRoute && `${routeSlugs.indexOf(d.slug) + 1}. `}{d.name}
                       </Link>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {getCategory(categories, d.category)?.name}
                       </p>
                     </div>
-                    {onMap && (
                       <button
                         type="button"
-                        onClick={() => {
-                          setSelectedSlug(d.slug);
-                          if (selectedCategory && d.category !== selectedCategory) {
-                            setSelectedCategory("");
-                          }
-                        }}
+                        onClick={() => setSelectedSlug(d.slug)}
                         className="shrink-0 text-xs font-semibold text-primary/80 hover:text-primary underline decoration-1"
                         aria-label={`${locale === "vi" ? "Xem trên bản đồ" : "View on map"} ${d.name}`}
                       >
                         📍 {locale === "vi" ? "Định vị" : "Locate"}
                       </button>
-                    )}
                   </div>
                   <p className="mt-2 text-xs text-muted-foreground">
-                    {onMap ? m.onMap : m.notOnMap}
+                    {m.onMap}
                   </p>
                 </li>
               );

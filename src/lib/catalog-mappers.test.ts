@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mapDestination, mapFood, mapStory, present } from "./catalog-mappers";
+import { oldQuarterLocation } from "@/data/old-quarter-location";
 
 describe("catalog mappers", () => {
   it("maps a destination using the Vietnamese translation", () => {
@@ -40,6 +41,23 @@ describe("catalog mappers", () => {
       ticketInfo: "30.000 VNĐ",
       sourceUrl: "https://example.org/source",
     });
+  });
+
+  it("fills the legacy sample Old Quarter position without changing curated coordinates", () => {
+    const row = {
+      slug: "hanoi-old-quarter",
+      category: { slug: "local-experiences" },
+      isSample: true,
+      latitude: null,
+      longitude: null,
+      sourceUrl: "https://hanoi.gov.vn",
+      translations: [{ locale: "vi", name: "Phố cổ Hà Nội", summary: "S" }],
+    };
+    expect(mapDestination(row)).toMatchObject(oldQuarterLocation);
+    expect(mapDestination({ ...row, isSample: false })).toMatchObject({ latitude: null, longitude: null });
+    expect(mapDestination({ ...row, sourceUrl: "https://example.org/curated" })).toMatchObject({ latitude: null, longitude: null });
+    const curated = { latitude: 21.033, longitude: 105.85, sourceUrl: "https://example.org/curated" };
+    expect(mapDestination({ ...row, ...curated })).toMatchObject(curated);
   });
 
   it("skips rows without a Vietnamese translation", () => {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PhoneCall, ShieldCheck, Smartphone } from "lucide-react";
+import { ArrowUpRight, Smartphone } from "lucide-react";
 import { footerLinks } from "@/config/site";
 import { localeFromPathname, localePath } from "@/i18n/locales";
 import { getMessages } from "@/i18n/messages";
@@ -15,30 +15,15 @@ export function Footer() {
   const isEn = locale === "en";
 
   return (
-    <footer className="bg-[#071f1c] text-white border-t border-amber-500/25">
-      {/* Top Banner: Emergency & Tourist Hotline */}
+    <footer className="border-t border-amber-500/25 bg-[#071f1c] pb-[calc(4.5rem+env(safe-area-inset-bottom))] text-white md:pb-0">
       <div className="border-b border-white/10 bg-[#051715]/80 px-4 py-4 md:px-6">
         <div className="mx-auto flex max-w-[1280px] flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-amber-300 font-medium">
-            <PhoneCall className="size-4 shrink-0" />
-            <span>
-              {isEn
-                ? "Official Hanoi Tourist Support Hotline:"
-                : "Tổng đài Hỗ trợ Du khách Thủ đô (Sở Du lịch Hà Nội):"}
-            </span>
-            <a href="tel:1800556896" className="font-bold text-white hover:underline">
-              1800 556 896
-            </a>
-            <span className="text-[10px] text-emerald-400 bg-emerald-500/20 px-1.5 py-0.2 rounded-full border border-emerald-500/30">
-              {isEn ? "24/7 Free" : "Miễn phí 24/7"}
-            </span>
-          </div>
+          <Link href={localePath(locale, "/contact")} className="inline-flex min-h-8 items-center gap-2 font-medium text-amber-300 hover:underline">
+            {isEn ? "Visitor support" : "Hỗ trợ du khách"}
+            <ArrowUpRight className="size-4" aria-hidden="true" />
+          </Link>
 
           <div className="flex items-center gap-4 text-white/70">
-            <span className="flex items-center gap-1.5">
-              <ShieldCheck className="size-3.5 text-emerald-400" />
-              <span>{isEn ? "Municipal Tourism Certified" : "Dữ liệu du lịch chính thức"}</span>
-            </span>
             <span className="hidden md:flex items-center gap-1.5">
               <Smartphone className="size-3.5 text-amber-300" />
               <span>{isEn ? "Installable PWA App" : "Ứng dụng PWA ngoại tuyến"}</span>
@@ -51,10 +36,10 @@ export function Footer() {
       <div className="mx-auto grid max-w-[1280px] gap-10 px-4 py-14 md:grid-cols-5 md:px-6">
         {/* Brand & Description Column (2 cols) */}
         <div className="md:col-span-2">
-          <Logo light locale={locale} />
+          <Logo isDark locale={locale} />
           <p className="mt-4 max-w-md text-xs md:text-sm text-white/75 leading-relaxed font-light">
             {isEn
-              ? "Official capital destination portal showcasing 1,000 years of dynastic heritage, street gastronomy, virtual 360° tours, and smart itinerary planning for global travelers."
+              ? "Explore Hanoi’s heritage, street food and neighborhoods, and plan your visit."
               : "Cổng thông tin du lịch Thủ đô giới thiệu 1.000 năm tinh hoa văn hiến, ẩm thực phố cổ, trải nghiệm tour thực tế ảo 360° và lập lịch trình di chuyển tối ưu cho du khách."}
           </p>
           <p className="mt-4 font-serif text-base text-secondary font-medium italic">

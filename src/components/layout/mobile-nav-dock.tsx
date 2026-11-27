@@ -18,8 +18,6 @@ export function MobileNavDock() {
   const basePath = pathname.replace(/^\/en(?=\/|$)/, "") || "/";
 
   return (
-    <>
-      <div className="h-[4.75rem] md:hidden" aria-hidden="true" />
       <nav
         aria-label={locale === "en" ? "Quick navigation" : "Điều hướng nhanh"}
         className="fixed inset-x-0 bottom-0 z-40 border-t border-[#d9d5ca] bg-[#fbf9f5]/95 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-10px_30px_rgba(10,46,42,0.10)] backdrop-blur-xl md:hidden"
@@ -43,6 +41,5 @@ export function MobileNavDock() {
           })}
         </div>
       </nav>
-    </>
   );
 }

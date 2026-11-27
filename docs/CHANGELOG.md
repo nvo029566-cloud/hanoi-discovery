@@ -11,6 +11,8 @@
 - Heritage trail: stops now show real opening hours and ticket info from the catalog, animate once, give visible "link copied" feedback, and use the caption as image alt.
 - "Why choose us" is now a server component; its heritage card links to `/stories` instead of duplicating `/destinations`.
 - Handbook magazine: removed `priority` from a below-the-fold image, re-animates when the topic changes, plain eyebrow.
+- Homepage motion: staggered hero entrance, slow push-in on the hero photo, count-up hero stats, gold scroll-progress bar, staggered reveals for feature cards and handbook articles, parallax on trail photos. New helpers `Reveal`, `CountUp`, `ScrollProgress`; all respect `prefers-reduced-motion`.
+- Hero background is now a looping 12 s video (`public/videos/hero-hanoi.mp4`, 3.3 MB, generated with ffmpeg as a slow camera move over the hero photo; replace it with real footage when available) with a poster; reduced-motion users get the still photo. Hero content tilts in 3D with the pointer (perspective, depth layers); feature cards use `ThreeDCard`.
 
 ## 2026-11-19 - M9: Destination portal essentials upgrade
 - **Travel Guide (`/guide` & `/en/guide`)**: Complete practical guide covering 4 seasons, arrival & inner-city transit (Airport Bus #86, Metro Line 2A & 3, Double-Decker City Tour, Cyclo/Electric tram), accommodation areas (Old Quarter, West Lake, Ba Dinh), and emergency hotline contacts.

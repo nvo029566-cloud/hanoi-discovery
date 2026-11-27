@@ -35,10 +35,9 @@ test("planner builds a plan from the homepage query", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Hồ Tây" })).toHaveCount(0);
 });
 
-test("homepage planner promo leads to the planner", async ({ page }) => {
+test("homepage planner link opens curated itineraries", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "3 ngày" }).click();
-  await page.getByRole("link", { name: "Tạo lịch trình" }).click();
-  await expect(page).toHaveURL(/\/planner\?days=3/);
-  await expect(page.getByRole("heading", { name: "Lịch trình gợi ý 3 ngày" })).toBeVisible();
+  await page.locator("#hero").getByRole("link", { name: "Lập lịch trình" }).click();
+  await expect(page).toHaveURL(/\/planner$/);
+  await expect(page.getByRole("tab", { name: "Lịch trình gợi ý" })).toHaveAttribute("aria-selected", "true");
 });

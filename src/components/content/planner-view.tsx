@@ -45,9 +45,6 @@ export function PlannerView({
     .flatMap((v) => v.split(","))
     .filter((v) => isCategorySlug(categories, v));
   const plan = buildItinerary(destinations, days, interests);
-  const totalDistance = plan.reduce((total, day) => total + calculateTotalRouteDistance(day.items), 0);
-  const totalStops = plan.reduce((total, day) => total + day.items.length, 0);
-  const totalTravelMinutes = Math.max(0, Math.round((totalDistance / 22) * 60));
 
   // Tab selection: If user came with query params, default to custom; else curated.
   const hasCustomParams = params.has("days") || params.has("interests");
@@ -55,8 +52,22 @@ export function PlannerView({
   const [copied, setCopied] = useState(false);
 
   const curatedList = getCuratedItineraries(locale);
-  const [selectedCuratedId, setSelectedCuratedId] = useState<string>(curatedList[0]?.id ?? "hanoi-1-day");
+  const [selectedCuratedId, setSelectedCuratedId] = useState(params.get("route") ?? curatedList[0]?.id);
   const selectedCurated = curatedList.find((c) => c.id === selectedCuratedId) ?? curatedList[0];
+  const showingCurated = activeTab === "curated" && selectedCurated;
+  const destinationBySlug = new Map(destinations.map((item) => [item.slug, item]));
+  const visibleDays = showingCurated ? selectedCurated.days : plan;
+  const totalStops = showingCurated
+    ? selectedCurated.days.reduce((total, day) => total + day.stops.length, 0)
+    : plan.reduce((total, day) => total + day.items.length, 0);
+  const routeDays = showingCurated
+    ? selectedCurated.days.map((day) => day.stops.map((stop) => destinationBySlug.get(stop.destinationSlug ?? "")))
+    : plan.map((day) => day.items);
+  const hasCompleteRoute = routeDays.some((items) => items.length > 1)
+    && routeDays.every((items) => items.every((item) => item?.latitude != null && item.longitude != null));
+  const totalDistance = hasCompleteRoute
+    ? routeDays.reduce((total, items) => total + calculateTotalRouteDistance(items.filter((item) => item !== undefined)), 0)
+    : null;
 
   const handlePrint = () => {
     if (typeof window !== "undefined") {
@@ -67,7 +78,15 @@ export function PlannerView({
   const handleCopyLink = async () => {
     if (typeof window !== "undefined") {
       try {
-        await navigator.clipboard.writeText(window.location.href);
+        const url = new URL(window.location.href);
+        url.search = "";
+        if (showingCurated) {
+          url.searchParams.set("route", selectedCurated.id);
+        } else {
+          url.searchParams.set("days", String(days));
+          interests.forEach((interest) => url.searchParams.append("interests", interest));
+        }
+        await navigator.clipboard.writeText(url.toString());
         setCopied(true);
         setTimeout(() => setCopied(false), 2500);
       } catch {
@@ -81,7 +100,7 @@ export function PlannerView({
       <div className="mb-6 grid grid-cols-3 overflow-hidden rounded-[20px] border border-border bg-surface shadow-sm">
         <div className="border-r border-border p-4 sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{locale === "vi" ? "Ngày" : "Days"}</p>
-          <p className="mt-1 font-serif text-2xl font-bold text-primary">{days}</p>
+          <p className="mt-1 font-serif text-2xl font-bold text-primary">{visibleDays.length}</p>
         </div>
         <div className="border-r border-border p-4 sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{locale === "vi" ? "Điểm dừng" : "Stops"}</p>
@@ -89,8 +108,14 @@ export function PlannerView({
         </div>
         <div className="p-4 sm:p-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{locale === "vi" ? "Quãng đường" : "Distance"}</p>
-          <p className="mt-1 font-serif text-2xl font-bold text-primary">{totalDistance.toFixed(1)} <span className="font-sans text-sm font-semibold">km</span></p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">~{totalTravelMinutes} {locale === "vi" ? "phút di chuyển" : "min travel"}</p>
+          {totalDistance === null ? (
+            <p className="mt-2 text-xs text-muted-foreground">{locale === "vi" ? "Chưa có ước tính" : "No estimate"}</p>
+          ) : (
+            <>
+              <p className="mt-1 font-serif text-2xl font-bold text-primary">≈ {totalDistance.toFixed(1)} <span className="font-sans text-sm font-semibold">km</span></p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">{locale === "vi" ? "Theo đường chim bay" : "Straight-line estimate"}</p>
+            </>
+          )}
         </div>
       </div>
       {/* Tab Switcher & Actions */}

@@ -28,11 +28,13 @@ export function MapLoader({
   points,
   locale = "vi",
   selectedSlug,
+  showRoute,
   onSelectPoint,
 }: {
   points: MappableDestination[];
   locale?: Locale;
   selectedSlug?: string;
+  showRoute?: boolean;
   onSelectPoint?: (slug: string) => void;
 }) {
   return (
@@ -40,6 +42,7 @@ export function MapLoader({
       points={points}
       locale={locale}
       selectedSlug={selectedSlug}
+      showRoute={showRoute}
       onSelectPoint={onSelectPoint}
     />
   );

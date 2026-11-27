@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/locales";
+import { oldQuarterLocation } from "@/data/old-quarter-location";
 import type { Category, CoverImage, CultureItem, Destination, Food, Story } from "@/types/content";
 
 /** Rows are described structurally so these mappers do not depend on the generated Prisma client. */
@@ -62,6 +63,7 @@ export function mapDestination(
   row: {
     slug: string;
     category: { slug: string };
+    isSample?: boolean;
     latitude?: number | null;
     longitude?: number | null;
     openingHours?: string | null;
@@ -73,17 +75,22 @@ export function mapDestination(
   locale: Locale = "vi",
 ): Destination | null {
   const t = resolve(row.translations, locale);
+  const hasLegacyOldQuarterLocation = row.slug === "hanoi-old-quarter" && row.isSample === true
+    && row.latitude == null && row.longitude == null
+    && (row.sourceUrl == null || row.sourceUrl === "https://hanoi.gov.vn");
+  const location = hasLegacyOldQuarterLocation ? oldQuarterLocation : row;
   return t
     ? {
         slug: row.slug,
         name: t.name,
         category: row.category.slug,
         summary: t.summary,
-        latitude: row.latitude ?? null,
-        longitude: row.longitude ?? null,
+        ...(row.isSample !== undefined ? { isSample: row.isSample } : {}),
+        latitude: location.latitude ?? null,
+        longitude: location.longitude ?? null,
         ...(row.openingHours !== undefined ? { openingHours: row.openingHours } : {}),
         ...(row.ticketInfo !== undefined ? { ticketInfo: row.ticketInfo } : {}),
-        sourceUrl: row.sourceUrl ?? null,
+        sourceUrl: location.sourceUrl ?? null,
         ...withImage(row.image, locale),
       }
     : null;

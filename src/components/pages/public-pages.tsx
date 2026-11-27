@@ -10,6 +10,8 @@ import { PlannerView } from "@/components/content/planner-view";
 import { DestinationsExplorer } from "@/components/destinations/destinations-explorer";
 import { DestinationCard } from "@/components/home/destination-card";
 import { Hero } from "@/components/home/hero";
+import { HomeSectionNav } from "@/components/home/home-section-nav";
+import { ScrollProgress } from "@/components/home/scroll-progress";
 import { HeritageStatsSection } from "@/components/home/heritage-stats-section";
 import { HeritageTrailShowcase } from "@/components/home/heritage-trail-showcase";
 import { WhyChooseUs } from "@/components/home/why-choose-us";
@@ -52,8 +54,10 @@ export async function HomePage({ locale }: { locale: Locale }) {
   };
   return (
     <>
+      <ScrollProgress />
       {/* Cinematic Hero Section with Search Form (Section 4 & 7) */}
-      <Hero locale={locale} destinationCount={destinations.length} />
+      <Hero locale={locale} />
+      <HomeSectionNav locale={locale} />
 
       {/* Dấu ấn di sản thủ đô (Section 8) */}
       <HeritageStatsSection locale={locale} counts={counts} />
@@ -136,9 +140,7 @@ export async function DestinationDetailPage({ locale, slug }: { locale: Locale; 
 
         {/* 2-Column Responsive Layout: Media & Reviews (8 cols) + Sticky Quick Facts & Actions Sidebar (4 cols) */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-12 items-start">
-          {/* Main Media & Narrative Column */}
-          <div className="lg:col-span-8 space-y-8">
-            <div className="overflow-hidden rounded-[14px] border border-border/80 bg-surface shadow-sm">
+          <div className="overflow-hidden rounded-[14px] border border-border/80 bg-surface shadow-sm lg:col-span-8 lg:col-start-1 lg:row-start-1">
               <CoverImage
                 image={destination.image}
                 slug={destination.slug}
@@ -148,19 +150,13 @@ export async function DestinationDetailPage({ locale, slug }: { locale: Locale; 
                 caption
                 className="aspect-[16/9] w-full"
               />
-            </div>
-
-            <AudioGuidePlayer title={destination.name} narrative={destination.summary} locale={locale} />
-
-            <div className="pt-2">
-              <DestinationReviews slug={destination.slug} title={destination.name} locale={locale} />
-            </div>
           </div>
 
           {/* Sticky Sidebar: Quick Info, Map & VR Actions, Sharing */}
-          <div className="lg:col-span-4 lg:sticky lg:top-28 space-y-6">
+          <div className="min-w-0 space-y-6 lg:sticky lg:top-28 lg:col-span-4 lg:col-start-9 lg:row-span-2 lg:row-start-1">
             <section aria-labelledby="info-title" className="rounded-[14px] border border-border bg-surface p-6 shadow-sm">
               <h2 id="info-title" className="font-serif text-xl sm:text-2xl font-bold text-foreground">{m.detail.infoTitle}</h2>
+              {destination.isSample && <p className="mt-2 text-xs text-muted-foreground">{m.common.sampleDataNote}</p>}
               {destination.openingHours || destination.ticketInfo || destination.latitude ? (
                 <div className="mt-5 space-y-4 text-sm">
                   {destination.openingHours && (
@@ -182,7 +178,7 @@ export async function DestinationDetailPage({ locale, slug }: { locale: Locale; 
                       </p>
                       <div className="flex flex-col gap-2.5">
                         <Link
-                          href={localePath(locale, "/map")}
+                          href={localePath(locale, "/map") + "?" + new URLSearchParams({ place: destination.slug })}
                           className="inline-flex min-h-11 items-center justify-center rounded-[8px] bg-primary/10 px-4 text-sm font-semibold text-primary hover:bg-primary/20 transition-colors"
                         >
                           {m.detail.viewOnMap}
@@ -202,7 +198,7 @@ export async function DestinationDetailPage({ locale, slug }: { locale: Locale; 
                   {destination.sourceUrl && (
                     <p className="pt-2 text-xs text-muted-foreground">
                       {m.common.sourceLabel}:{" "}
-                      <a href={destination.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                      <a href={destination.sourceUrl} target="_blank" rel="noopener noreferrer" className="wrap-anywhere underline hover:text-primary">
                         {destination.sourceUrl}
                       </a>
                     </p>
@@ -228,6 +224,10 @@ export async function DestinationDetailPage({ locale, slug }: { locale: Locale; 
                 />
               </div>
             </div>
+          </div>
+          <div className="space-y-8 lg:col-span-8 lg:col-start-1 lg:row-start-2">
+            <AudioGuidePlayer title={destination.name} narrative={destination.summary} locale={locale} />
+            <DestinationReviews slug={destination.slug} title={destination.name} locale={locale} />
           </div>
         </div>
 
@@ -429,7 +429,9 @@ export async function MapPage({ locale }: { locale: Locale }) {
         title={m.pages.map.title}
         description={m.pages.map.intro}
       />
-      <PlacesMap destinations={destinations} categories={categories} locale={locale} />
+      <Suspense fallback={<p className="mt-8 text-muted-foreground">{m.common.loading}</p>}>
+        <PlacesMap destinations={destinations} categories={categories} locale={locale} />
+      </Suspense>
     </PageShell>
   );
 }

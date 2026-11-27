@@ -1,11 +1,32 @@
 export interface LocalPhoto {
   src: string;
   credit: string;
-  license: string;
-  sourceUrl: string;
+  license?: string;
+  licenseUrl?: string;
+  sourceUrl?: string;
+  illustration?: boolean;
+  cropped?: boolean;
 }
 
 export const localPhotos: Record<string, LocalPhoto> = {
+  "banh-tom-ho-tay": {
+    src: "/images/banh-tom-ho-tay-photo.webp",
+    credit: "Phương Huy / Wikimedia Commons",
+    license: "CC BY-SA 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by-sa/4.0/",
+    sourceUrl: "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_b%C3%A1nh_t%C3%B4m_H%E1%BB%93_T%C3%A2y_%2810%29.jpg",
+    cropped: true,
+  },
+  "banh-mi-dan-to": {
+    src: "/images/banh-mi-dan-to-illustration.webp",
+    credit: "Hanoi Discovery",
+    illustration: true,
+  },
+  "lau-rieu-cua-bap-bo": {
+    src: "/images/lau-rieu-cua-bap-bo-illustration.webp",
+    credit: "Hanoi Discovery",
+    illustration: true,
+  },
   "hoan-kiem-lake": {
     "src": "/images/hoan-kiem-lake.jpg",
     "credit": "Wikimedia Commons (CC-BY-SA)",
@@ -294,12 +315,6 @@ export const localPhotos: Record<string, LocalPhoto> = {
     "license": "Creative Commons (CC-BY-SA / Public Domain)",
     "sourceUrl": "https://vi.wikipedia.org/wiki/C%E1%BB%95_Loa"
   },
-  "banh-tom-ho-tay": {
-    "src": "/images/banh-tom-ho-tay.jpg",
-    "credit": "Wikimedia Commons (CC-BY-SA)",
-    "license": "Creative Commons (CC-BY-SA / Public Domain)",
-    "sourceUrl": "https://vi.wikipedia.org/wiki/B%C3%A1nh_t%C3%B4m_H%E1%BB%93_T%C3%A2y"
-  },
   "nom-bo-kho": {
     "src": "/images/nom-bo-kho.jpg",
     "credit": "Wikimedia Commons (CC-BY-SA)",
@@ -311,18 +326,6 @@ export const localPhotos: Record<string, LocalPhoto> = {
     "credit": "Wikimedia Commons (CC-BY-SA)",
     "license": "Creative Commons (CC-BY-SA / Public Domain)",
     "sourceUrl": "https://vi.wikipedia.org/wiki/B%C3%BAn_%E1%BB%91c"
-  },
-  "banh-mi-dan-to": {
-    "src": "/images/banh-mi-dan-to.jpg",
-    "credit": "Wikimedia Commons (CC-BY-SA)",
-    "license": "Creative Commons (CC-BY-SA / Public Domain)",
-    "sourceUrl": "https://vi.wikipedia.org/wiki/B%C3%A1nh_m%C3%AC_Vi%E1%BB%87t_Nam"
-  },
-  "lau-rieu-cua-bap-bo": {
-    "src": "/images/lau-rieu-cua-bap-bo.jpg",
-    "credit": "Wikimedia Commons (CC-BY-SA)",
-    "license": "Creative Commons (CC-BY-SA / Public Domain)",
-    "sourceUrl": "https://vi.wikipedia.org/wiki/L%E1%BA%A9u"
   },
   "banh-cuon-thanh-tri": {
     "src": "/images/banh-cuon-thanh-tri.jpg",

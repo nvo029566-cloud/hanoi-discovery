@@ -24,7 +24,7 @@ export function Tour360Button({
         onClick={() => setIsOpen(true)}
         className="inline-flex min-h-10 items-center gap-1.5 rounded-[8px] bg-amber-500/15 border border-amber-500/30 px-4 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition-colors"
       >
-        <Compass className="size-4 animate-spin-slow" />
+        <Compass className="size-4" aria-hidden="true" />
         <span>{locale === "en" ? "Explore 360° VR Tour" : "Khám phá Tour 360° VR"}</span>
       </button>
 

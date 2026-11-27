@@ -39,15 +39,19 @@ export function MobileNav({
         toggleRef.current?.focus();
       }
     };
+    const desktop = window.matchMedia("(min-width: 1280px)");
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
     document.addEventListener("keydown", onKey);
+    desktop.addEventListener("change", closeOnDesktop);
     return () => {
       document.body.style.overflow = prev;
       document.removeEventListener("keydown", onKey);
+      desktop.removeEventListener("change", closeOnDesktop);
     };
   }, [open]);
 
   return (
-    <div className="lg:hidden">
+    <div className="xl:hidden">
       <button
         ref={toggleRef}
         type="button"
@@ -70,7 +74,7 @@ export function MobileNav({
         <div
           id="mobile-menu"
           ref={panelRef}
-          className="fixed inset-x-0 top-16 z-50 h-[calc(100dvh-4rem)] overflow-y-auto bg-[#FAF8F3] p-5 text-[#233B32] md:top-20 md:h-[calc(100dvh-5rem)] border-t border-[#DEDAD1] shadow-2xl"
+          className="fixed inset-x-0 top-18 z-50 h-[calc(100dvh-4.5rem)] overflow-y-auto bg-[#FAF8F3] p-5 text-[#233B32] sm:top-20 sm:h-[calc(100dvh-5rem)] border-t border-[#DEDAD1] shadow-2xl"
         >
           {/* Quick Search in Mobile Drawer */}
           {onOpenSearch && (
@@ -109,7 +113,7 @@ export function MobileNav({
           {/* Navigation Links */}
           <nav aria-label={m.mobileMenu}>
             <ul className="flex flex-col space-y-1">
-              {mainNav.map((item) => {
+              {[...mainNav.filter((item) => item.href !== "/planner"), { href: "/map", key: "map" } as const].map((item) => {
                 const active = isActive(item.href);
                 return (
                   <li key={item.href} className="border-b border-[#DEDAD1]/50">

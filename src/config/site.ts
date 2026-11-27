@@ -7,13 +7,11 @@ export const siteConfig = {
 
 /** Locale-free paths; `key` selects the label from the i18n messages (messages.nav). */
 export const mainNav = [
-  { href: "/", key: "home" },
   { href: "/destinations", key: "destinations" },
   { href: "/food", key: "food" },
   { href: "/culture", key: "culture" },
   { href: "/planner", key: "planner" },
   { href: "/guide", key: "guide" },
-  { href: "/about", key: "about" },
 ] as const;
 
 export const footerLinks = {

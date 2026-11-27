@@ -88,8 +88,8 @@ export function DestinationReviews({
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
             {locale === "vi"
-              ? `Cảm nhận thực tế và kinh nghiệm khám phá ${title}`
-              : `Real impressions and visitor tips for ${title}`}
+              ? `Đánh giá mẫu về ${title}. Đánh giá bạn viết được lưu trên thiết bị này.`
+              : `Sample reviews for ${title}. Reviews you write are saved on this device.`}
           </p>
         </div>
 
